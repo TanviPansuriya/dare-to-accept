@@ -1,0 +1,1522 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Dare To Accept API",
+    "version": "1.0.0",
+    "description": "API documentation for Dare To Accept platform."
+  },
+  "host": "localhost:5000",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/auth/forgot-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Send a password reset email",
+        "description": "Allows a user to request a password reset email.",
+        "operationId": "forgotPassword",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ForgotPasswordRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Password reset email sent"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Error sending email"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Log in a user",
+        "description": "Authenticates a user and returns a JWT token.",
+        "operationId": "login",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login successful"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/auth/signup": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Sign up a new user",
+        "description": "Registers a new user and returns a JWT token.",
+        "operationId": "signup",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SignupRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User created successfully"
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Error creating user"
+          }
+        }
+      }
+    },
+    "/campaigns": {
+      "get": {
+        "tags": [
+          "Campaigns"
+        ],
+        "summary": "Get all campaigns",
+        "description": "Fetches a paginated list of all campaigns.",
+        "operationId": "getCampaigns",
+        "parameters": [
+          {
+            "$ref": "#/parameters/PageParam"
+          },
+          {
+            "$ref": "#/parameters/LimitParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of campaigns",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Campaign"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Campaigns"
+        ],
+        "summary": "Create a new campaign",
+        "description": "Allows a user to create a new campaign.",
+        "operationId": "createCampaign",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Campaign"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Campaign created"
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/campaigns/{id}/donations": {
+      "get": {
+        "tags": [
+          "Campaigns",
+          "Donations"
+        ],
+        "summary": "Get all donations for a campaign",
+        "description": "Fetches a list of all donations made to a specific campaign.",
+        "operationId": "getCampaignDonations",
+        "parameters": [
+          {
+            "$ref": "#/parameters/CampaignIdParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of donations",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Donation"
+              }
+            }
+          },
+          "404": {
+            "description": "Campaign not found"
+          }
+        }
+      }
+    },
+    "/donations/one-time": {
+      "post": {
+        "tags": [
+          "Donations"
+        ],
+        "summary": "Create a one-time donation",
+        "description": "Allows a user to make a one-time donation to a campaign.",
+        "operationId": "createOneTimeDonation",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OneTimeDonationRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Donation created successfully"
+          },
+          "404": {
+            "description": "Campaign not found"
+          },
+          "500": {
+            "description": "Error creating donation"
+          }
+        }
+      }
+    },
+    "/campaigns/status/{status}": {
+      "get": {
+        "tags": [
+          "Campaigns"
+        ],
+        "summary": "Get campaigns by status",
+        "description": "Fetches a list of campaigns filtered by their status (e.g., pending, approved).",
+        "operationId": "getCampaignsByStatus",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "status",
+            "required": true,
+            "type": "string",
+            "description": "The status of the campaigns to fetch (e.g., pending, approved)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of campaigns with the specified status",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Campaign"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/campaigns/mode/{mode}": {
+      "get": {
+        "tags": [
+          "Campaigns"
+        ],
+        "summary": "Get campaigns by mode",
+        "description": "Fetches a list of campaigns filtered by their mode (e.g., who-dares, help-me-through).",
+        "operationId": "getCampaignsByMode",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "mode",
+            "required": true,
+            "type": "string",
+            "description": "The mode of the campaigns to fetch (e.g., who-dares, help-me-through)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of campaigns with the specified mode",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Campaign"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/campaigns/totals": {
+      "get": {
+        "tags": [
+          "Campaigns"
+        ],
+        "summary": "Get campaign totals",
+        "description": "Fetches the total counts of campaigns, challenges, users, and donations.",
+        "operationId": "getCampaignTotals",
+        "responses": {
+          "200": {
+            "description": "Totals retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "totalCampaigns": {
+                  "type": "integer"
+                },
+                "totalChallenges": {
+                  "type": "integer"
+                },
+                "totalUsers": {
+                  "type": "integer"
+                },
+                "totalDonations": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get current user's profile",
+        "description": "Fetches the profile of the currently authenticated user, including their campaigns and donation history.",
+        "operationId": "getCurrentUserProfile",
+        "responses": {
+          "200": {
+            "description": "User profile retrieved successfully",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        }
+      }
+    },
+    "/comments/{campaignId}": {
+      "get": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "Get comments for a campaign",
+        "description": "Fetches all comments associated with a specific campaign.",
+        "operationId": "getCampaignComments",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "campaignId",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the campaign to fetch comments for."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of comments for the campaign",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Comment"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "Add a comment to a campaign",
+        "description": "Allows a user to add a comment to a specific campaign.",
+        "operationId": "addCampaignComment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "campaignId",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the campaign to add a comment to."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Comment added successfully"
+          },
+          "404": {
+            "description": "Campaign not found"
+          }
+        }
+      }
+    },
+    "/updates/{campaignId}": {
+      "get": {
+        "tags": [
+          "Updates"
+        ],
+        "summary": "Get updates for a campaign",
+        "description": "Fetches all updates associated with a specific campaign.",
+        "operationId": "getCampaignUpdates",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "campaignId",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the campaign to fetch updates for."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of updates for the campaign",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Update"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/challenges/{challengeId}/voting-status": {
+      "get": {
+        "tags": [
+          "Challenges"
+        ],
+        "summary": "Get voting status for a challenge",
+        "description": "Fetches the voting status for a specific challenge, including vote counts and time left.",
+        "operationId": "getChallengeVotingStatus",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "challengeId",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the challenge to fetch voting status for."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Voting status retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "votingOpen": {
+                  "type": "boolean"
+                },
+                "timeLeftMs": {
+                  "type": "integer"
+                },
+                "voteCounts": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "integer"
+                  }
+                },
+                "endsAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/campaigns": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get all campaigns (admin view)",
+        "description": "Fetches all campaigns for administrative purposes.",
+        "operationId": "getAdminCampaigns",
+        "responses": {
+          "200": {
+            "description": "List of all campaigns retrieved successfully",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Campaign"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/totals": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get admin totals",
+        "description": "Fetches total counts of campaigns, challenges, users, and donations for administrative purposes.",
+        "operationId": "getAdminTotals",
+        "responses": {
+          "200": {
+            "description": "Admin totals retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "totalCampaigns": {
+                  "type": "integer"
+                },
+                "totalChallenges": {
+                  "type": "integer"
+                },
+                "totalUsers": {
+                  "type": "integer"
+                },
+                "totalDonations": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/campaigns/{id}": {
+      "put": {
+        "tags": [
+          "Campaigns"
+        ],
+        "summary": "Update a campaign",
+        "description": "Updates the details of a specific campaign.",
+        "operationId": "updateCampaign",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the campaign to update."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Campaign updated successfully",
+            "schema": {
+              "$ref": "#/definitions/Campaign"
+            }
+          }
+        }
+      }
+    },
+    "/admin/campaigns/{id}/suspend": {
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Suspend a campaign",
+        "description": "Suspends a specific campaign for administrative purposes.",
+        "operationId": "suspendCampaign",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the campaign to suspend."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Campaign suspended successfully",
+            "schema": {
+              "$ref": "#/definitions/Campaign"
+            }
+          }
+        }
+      }
+    },
+    "/campaigns/{campaignId}/payout": {
+      "post": {
+        "tags": [
+          "Campaigns"
+        ],
+        "summary": "Payout campaign funds",
+        "description": "Allows the campaign owner or admin to request a payout of campaign funds.",
+        "operationId": "payoutCampaign",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "campaignId",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the campaign to payout."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payout successful"
+          },
+          "403": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Campaign not found"
+          }
+        }
+      }
+    },
+    "/withdrawals": {
+      "post": {
+        "tags": [
+          "Withdrawals"
+        ],
+        "summary": "Create a withdrawal request",
+        "description": "Allows a user to request a withdrawal to their bank account.",
+        "operationId": "createWithdrawal",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "number",
+                  "description": "Amount to withdraw"
+                },
+                "bankAccount": {
+                  "type": "string",
+                  "description": "Bank account details"
+                }
+              },
+              "required": [
+                "amount",
+                "bankAccount"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Withdrawal request successful"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "500": {
+            "description": "Error processing withdrawal"
+          }
+        }
+      }
+    },
+    "/challenges": {
+      "post": {
+        "tags": [
+          "Challenges"
+        ],
+        "summary": "Create a new challenge",
+        "description": "Allows a user to create a new challenge.",
+        "operationId": "createChallenge",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ChallengeRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Challenge created successfully",
+            "schema": {
+              "$ref": "#/definitions/Challenge"
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Error creating challenge"
+          }
+        }
+      }
+    },
+    "/challenges/{challengeId}/join": {
+      "post": {
+        "tags": [
+          "Challenges"
+        ],
+        "summary": "Join a challenge",
+        "description": "Allows a user to join a specific challenge.",
+        "operationId": "joinChallenge",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "challengeId",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the challenge to join."
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/JoinChallengeRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Joined challenge successfully",
+            "schema": {
+              "$ref": "#/definitions/Participant"
+            }
+          },
+          "400": {
+            "description": "Already joined or invalid request"
+          },
+          "404": {
+            "description": "Challenge not found"
+          }
+        }
+      }
+    },
+    "/challenges/{challengeId}/participants/{participantId}/out": {
+      "post": {
+        "tags": [
+          "Challenges"
+        ],
+        "summary": "Admit defeat in a challenge",
+        "description": "Allows a participant to admit defeat in a specific challenge.",
+        "operationId": "admitDefeat",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "challengeId",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the challenge."
+          },
+          {
+            "in": "path",
+            "name": "participantId",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the participant admitting defeat."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Defeat admitted successfully",
+            "schema": {
+              "$ref": "#/definitions/Participant"
+            }
+          },
+          "400": {
+            "description": "Cannot admit defeat in current status"
+          },
+          "404": {
+            "description": "Participant not found"
+          }
+        }
+      }
+    },
+    "/challenges/{challengeId}/participants/{participantId}/dispute": {
+      "post": {
+        "tags": [
+          "Challenges"
+        ],
+        "summary": "Dispute result of a challenge",
+        "description": "Allows a participant to dispute the result of a specific challenge.",
+        "operationId": "disputeResult",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "challengeId",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the challenge."
+          },
+          {
+            "in": "path",
+            "name": "participantId",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the participant disputing the result."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dispute triggered successfully",
+            "schema": {
+              "$ref": "#/definitions/Challenge"
+            }
+          },
+          "404": {
+            "description": "Participant not found"
+          }
+        }
+      }
+    },
+    "/challenges/{challengeId}/confirm-winner": {
+      "post": {
+        "tags": [
+          "Challenges"
+        ],
+        "summary": "Confirm winner of a challenge",
+        "description": "Allows the creator of a challenge to confirm the winner.",
+        "operationId": "confirmWinner",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "challengeId",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the challenge."
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ConfirmWinnerRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Winner confirmed successfully",
+            "schema": {
+              "$ref": "#/definitions/Participant"
+            }
+          },
+          "403": {
+            "description": "Only the creator can confirm the winner"
+          },
+          "404": {
+            "description": "Challenge or winner not found"
+          }
+        }
+      }
+    },
+    "/challenges/{challengeId}/vote": {
+      "post": {
+        "tags": [
+          "Challenges"
+        ],
+        "summary": "Vote for a winner during dispute phase",
+        "description": "Allows a user to vote for a winner during the dispute phase of a challenge.",
+        "operationId": "voteForWinner",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "challengeId",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the challenge."
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/VoteRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vote recorded successfully",
+            "schema": {
+              "$ref": "#/definitions/Vote"
+            }
+          },
+          "400": {
+            "description": "Already voted or voting not open"
+          },
+          "404": {
+            "description": "Participant not found"
+          }
+        }
+      }
+    },
+    "/charities": {
+      "post": {
+        "tags": [
+          "Charities"
+        ],
+        "summary": "Create a new charity",
+        "description": "Allows a challenge poster to create a new charity. The charity must be approved by an admin before it becomes active.",
+        "operationId": "createCharity",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CharityRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Charity submitted for approval",
+            "schema": {
+              "$ref": "#/definitions/Charity"
+            }
+          },
+          "500": {
+            "description": "Error creating charity"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Charities"
+        ],
+        "summary": "Get all charities",
+        "description": "Retrieves a list of all charities. Optionally filters by approval status using the `approved` query parameter.",
+        "operationId": "getCharities",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "approved",
+            "required": false,
+            "type": "boolean",
+            "description": "Filter charities by approval status (true or false)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of charities retrieved successfully",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Charity"
+              }
+            }
+          },
+          "500": {
+            "description": "Error fetching charities"
+          }
+        }
+      }
+    },
+    "/charities/{charityId}/approve": {
+      "put": {
+        "tags": [
+          "Charities"
+        ],
+        "summary": "Approve a charity",
+        "description": "Allows an admin to approve a charity. Only admins can perform this action.",
+        "operationId": "approveCharity",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "charityId",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the charity to approve."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Charity approved successfully",
+            "schema": {
+              "$ref": "#/definitions/Charity"
+            }
+          },
+          "403": {
+            "description": "Admin access required"
+          },
+          "404": {
+            "description": "Charity not found"
+          },
+          "500": {
+            "description": "Error approving charity"
+          }
+        }
+      }
+    },
+    "/charities/bulk": {
+      "post": {
+        "tags": [
+          "Charities"
+        ],
+        "summary": "Bulk upload charities",
+        "description": "Allows uploading multiple charities at once.",
+        "operationId": "bulkCreateCharities",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BulkCharityRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Charities created successfully",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Charity"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input: charities must be a non-empty array",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Invalid input: charities must be a non-empty array"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error creating charities",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Error creating charities"
+                },
+                "error": {
+                  "type": "string",
+                  "example": "Detailed error message"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/upload": {
+      "post": {
+        "tags": [
+          "Media"
+        ],
+        "summary": "Upload media file",
+        "description": "Allows the frontend to upload a media file (image or video) as multipart/form-data. The server uploads the media to Cloudinary and returns the media URL in the response.",
+        "operationId": "uploadMedia",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "file",
+            "required": true,
+            "type": "file",
+            "description": "The media file to upload (image or video)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Media uploaded successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "File uploaded successfully"
+                },
+                "secureUrl": {
+                  "type": "string",
+                  "example": "https://res.cloudinary.com/demo/image/upload/v1234567890/sample.jpg"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or no file uploaded",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "No file uploaded"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error uploading media",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Error uploading media"
+                },
+                "error": {
+                  "type": "string",
+                  "example": "Detailed error message"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/campaigns/{campaignId}/participants": {
+      "get": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Get all participants for a specific campaign",
+        "description": "Fetch all participants associated with a specific campaign.",
+        "parameters": [
+          {
+            "name": "campaignId",
+            "in": "path",
+            "required": true,
+            "description": "ID of the campaign",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of participants",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Participant"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Campaign not found"
+          },
+          "500": {
+            "description": "Error fetching participants"
+          }
+        }
+      }
+    },
+    "/participants": {
+      "get": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Get all participants across all campaigns",
+        "description": "Fetch all participants across all campaigns.",
+        "responses": {
+          "200": {
+            "description": "List of participants",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Participant"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error fetching participants"
+          }
+        }
+      }
+    },
+    "/api/withdrawals/pending": {
+      "get": {
+        "tags": [
+          "Withdrawals"
+        ],
+        "summary": "Get all pending charity withdrawals",
+        "description": "Returns a list of CharityPayouts with status 'pending'.",
+        "operationId": "getPendingWithdrawals",
+        "responses": {
+          "200": {
+            "description": "List of pending CharityPayouts",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CharityPayout"
+              }
+            }
+          },
+          "500": {
+            "description": "Error fetching pending payouts"
+          }
+        }
+      }
+    },
+    "/api/withdrawals/{id}/status": {
+      "patch": {
+        "tags": [
+          "Withdrawals"
+        ],
+        "summary": "Update the status of a charity payout",
+        "description": "Allows updating the status of a charity payout to 'sorted' or 'rejected'.",
+        "operationId": "updatePayoutStatus",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the CharityPayout to update."
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "sorted",
+                    "rejected"
+                  ],
+                  "description": "The new status of the payout."
+                }
+              },
+              "required": [
+                "status"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payout status updated successfully",
+            "schema": {
+              "$ref": "#/definitions/CharityPayout"
+            }
+          },
+          "400": {
+            "description": "Invalid status value"
+          },
+          "404": {
+            "description": "Payout not found"
+          },
+          "500": {
+            "description": "Error updating payout status"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "CharityPayout": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "description": "Unique identifier for the CharityPayout."
+        },
+        "charity": {
+          "type": "string",
+          "description": "The ObjectId of the associated charity."
+        },
+        "charityName": {
+          "type": "string",
+          "description": "The name of the associated charity."
+        },
+        "amount": {
+          "type": "number",
+          "description": "The amount to be paid out."
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "sorted",
+            "rejected"
+          ],
+          "description": "The current status of the payout."
+        },
+        "bankDetails": {
+          "type": "object",
+          "properties": {
+            "bank_name": {
+              "type": "string",
+              "description": "The name of the bank."
+            },
+            "account_number": {
+              "type": "string",
+              "description": "The account number for the payout."
+            },
+            "routing_number": {
+              "type": "string",
+              "description": "The routing number for the payout."
+            }
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the payout was created."
+        }
+      }
+    }
+  },
+  "parameters": {
+    "PageParam": {
+      "name": "page",
+      "in": "query",
+      "required": false,
+      "type": "integer",
+      "description": "Page number for pagination"
+    },
+    "LimitParam": {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "type": "integer",
+      "description": "Number of items per page"
+    },
+    "CampaignIdParam": {
+      "name": "id",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "description": "ID of the campaign"
+    }
+  },
+  "definitions": {
+    "ForgotPasswordRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email"
+        }
+      },
+      "required": [
+        "email"
+      ]
+    },
+    "LoginRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "password": {
+          "type": "string",
+          "format": "password"
+        }
+      },
+      "required": [
+        "email",
+        "password"
+      ]
+    },
+    "SignupRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "password": {
+          "type": "string",
+          "format": "password"
+        }
+      },
+      "required": [
+        "name",
+        "email",
+        "password"
+      ]
+    },
+    "Campaign": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "goal": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "Comment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        }
+      }
+    },
+    "Update": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        }
+      }
+    },
+    "BulkCharityRequest": {
+      "type": "object",
+      "properties": {
+        "charities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CharityInput"
+          }
+        }
+      },
+      "required": [
+        "charities"
+      ]
+    },
+    "CharityInput": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the charity"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the charity"
+        },
+        "registrationNumber": {
+          "type": "string",
+          "description": "Registration number of the charity"
+        },
+        "website": {
+          "type": "string",
+          "description": "Website URL of the charity"
+        },
+        "logoUrl": {
+          "type": "string",
+          "description": "Logo URL of the charity"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "registrationNumber",
+        "website",
+        "logoUrl"
+      ]
+    },
+    "Charity": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the charity"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the charity"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the charity"
+        },
+        "registrationNumber": {
+          "type": "string",
+          "description": "Registration number of the charity"
+        },
+        "website": {
+          "type": "string",
+          "description": "Website URL of the charity"
+        },
+        "logoUrl": {
+          "type": "string",
+          "description": "Logo URL of the charity"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the charity was created"
+        }
+      }
+    }
+  }
+}
